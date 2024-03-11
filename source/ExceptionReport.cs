@@ -13,9 +13,6 @@ namespace ChaosUtil.Debug
         /// <summary> The directory to save log files to. </summary>
         public static readonly string LOG_DIRECTORY = Constants.LOG_DIRECTORY + "\\Exceptions\\";
 
-        /// <summary> The format used for time stamps in file names. </summary>
-        public const string TIME_FORMAT = "yyyy-MM-dd-HH-mm-ss-fff";
-
         static readonly string[] LOG_COLUMNS = { "Declaration", "Accessor", "FieldType", "DeclaringType", "Name", "Value" };
         static readonly Flags[] allFieldFlags;
 
@@ -33,7 +30,7 @@ namespace ChaosUtil.Debug
         public static void PrintExceptionReport(System.Exception ex)
         {
             System.DateTime time = System.DateTime.Now;
-            string path = $"{LOG_DIRECTORY}{time.ToString(TIME_FORMAT)}_{ex.GetType().Name}";
+            string path = $"{LOG_DIRECTORY}{time.ToString(Constants.TIME_FORMAT)}_{ex.GetType().Name}";
             if (System.IO.File.Exists($"{path}.log"))
             {
                 int i = 2;
