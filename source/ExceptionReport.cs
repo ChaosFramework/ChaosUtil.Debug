@@ -10,8 +10,8 @@ namespace ChaosUtil.Debug
     /// <summary> Provides functions to create an exception report and save it to a file. </summary>
     public static class ExceptionReport
     {
-        /// <summary> The directory to save log files to. </summary>
-        public static readonly string LOG_DIRECTORY = Constants.LOG_DIRECTORY + "\\Exceptions\\";
+        /// <summary> The directory to save exception log files to. Ends with a backslash. </summary>
+        public static readonly string LOG_DIRECTORY = $"{Constants.LOG_DIRECTORY}Exceptions\\";
 
         static readonly string[] LOG_COLUMNS = { "Declaration", "Accessor", "FieldType", "DeclaringType", "Name", "Value" };
         static readonly Flags[] allFieldFlags;
