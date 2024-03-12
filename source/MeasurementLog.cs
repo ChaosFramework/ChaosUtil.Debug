@@ -47,8 +47,8 @@ namespace ChaosUtil.Debug
             }
         }
 
-        /// <summary> The directory to save log files to. </summary>
-        public static readonly string LOG_DIRECTORY = Constants.LOG_DIRECTORY + "\\Measurements\\";
+        /// <summary> The directory to save measurement log files to. Ends with a backslash. </summary>
+        public static readonly string LOG_DIRECTORY = $"{Constants.LOG_DIRECTORY}Measurements\\";
 
         const int SLEEP = 1000;
         const long MAX_FILE_SIZE = 10000000;
@@ -77,7 +77,7 @@ namespace ChaosUtil.Debug
             foreach (string file in Directory.EnumerateFiles(LOG_DIRECTORY))
                 File.Delete(file);
 
-            wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}\\Measure {fileCounter++}.xml"));
+            wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
             System.Threading.Thread worker = new System.Threading.Thread(FlushRegularly);
             worker.Start();
 #endif
@@ -246,7 +246,7 @@ namespace ChaosUtil.Debug
                         {
                             wr.Flush();
                             wr.Close();
-                            wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}\\Measure {fileCounter++}.xml"));
+                            wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
                         }
                         wr.Write(nextChunk);
                     }
