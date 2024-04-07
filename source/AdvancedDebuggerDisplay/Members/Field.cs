@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using FieldMap = System.Collections.Generic.Dictionary<
     System.Type,

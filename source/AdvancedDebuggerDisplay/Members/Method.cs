@@ -1,4 +1,4 @@
-﻿using ChaosUtil.Primitives;
+using ChaosUtil.Primitives;
 using System;
 using System.Reflection;
 using MethodMap = System.Collections.Generic.Dictionary<

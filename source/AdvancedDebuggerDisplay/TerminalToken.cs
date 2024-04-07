@@ -1,4 +1,4 @@
-﻿namespace ChaosUtil.Debug.AdvancedDebuggerDisplay
+namespace ChaosUtil.Debug.AdvancedDebuggerDisplay
 {
     class TerminalToken : Token
     {

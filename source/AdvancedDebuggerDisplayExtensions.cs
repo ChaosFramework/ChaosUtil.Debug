@@ -1,4 +1,4 @@
-﻿using ChaosUtil.Debug.AdvancedDebuggerDisplay;
+using ChaosUtil.Debug.AdvancedDebuggerDisplay;
 using ChaosUtil.Reflection;
 using System;
 using System.Diagnostics;
@@ -12,7 +12,7 @@ public static class AdvancedDebuggerDisplayExtensions
 
     static readonly SysCol.Dictionary<Type, DebuggerDisplayAttribute> displayAttributes
         = new SysCol.Dictionary<Type, DebuggerDisplayAttribute>();
-    
+
     /// <summary>
     ///     Returns a string representation of <paramref name="obj"/> as displayed by the debugger.
     ///     If a <see cref="DebuggerDisplayAttribute"/> is attached to <typeparamref name="T"/>,
