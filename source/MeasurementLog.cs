@@ -211,8 +211,6 @@ namespace ChaosUtil.Debug
 #if Measure
             lock (currentNode)
             {
-                AssertNonZeroDepth();
-
                 currentNode.AppendLine(new string('\t', depth) + $"<{name} time=\"{GetTimeString(duration)}\"/>");
                 FinishNode();
             }
