@@ -1,5 +1,3 @@
-#define Measure
-
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -72,7 +70,6 @@ namespace ChaosUtil.Debug
 
         static MeasurementLog()
         {
-#if Measure
             Directory.CreateDirectory(LOG_DIRECTORY);
             foreach (string file in Directory.EnumerateFiles(LOG_DIRECTORY))
                 File.Delete(file);
@@ -80,7 +77,6 @@ namespace ChaosUtil.Debug
             wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
             System.Threading.Thread worker = new System.Threading.Thread(FlushRegularly);
             worker.Start();
-#endif
         }
 
         static void FlushRegularly()
@@ -101,7 +97,6 @@ namespace ChaosUtil.Debug
         [Conditional("Measure")]
         public static void StartMeasure(string action, params CustomAttribute[] attrs)
         {
-#if Measure
             lock (currentNode)
             {
                 AsserMaxDepth();
@@ -123,7 +118,6 @@ namespace ChaosUtil.Debug
                 currentNode.AppendLine(">");
                 PopClock().Restart();
             }
-#endif
         }
 
         /// <summary> Ends the most recently started still running measure. </summary>
@@ -135,7 +129,6 @@ namespace ChaosUtil.Debug
         [Conditional("Measure")]
         public static void EndMeasure(System.Func<double, SysCol.IEnumerable<CustomAttribute>> appendAttribute = null)
         {
-#if Measure
             lock (currentNode)
             {
                 AssertNonZeroDepth();
@@ -179,7 +172,6 @@ namespace ChaosUtil.Debug
                 freeClocks.Push(clock);
                 FinishNode();
             }
-#endif
         }
 
         static string GetTimeString(double tm)
@@ -208,13 +200,11 @@ namespace ChaosUtil.Debug
         [Conditional("Measure")]
         public static void AddMeasurement(string name, double duration)
         {
-#if Measure
             lock (currentNode)
             {
                 currentNode.AppendLine(new string('\t', depth) + $"<{name} time=\"{GetTimeString(duration)}\"/>");
                 FinishNode();
             }
-#endif
         }
 
         static void FinishNode()
@@ -258,6 +248,7 @@ namespace ChaosUtil.Debug
         ///     After this is called no more measurements are written to any log files.
         ///     Measurements that were started but no yet completed will be discarded.
         /// </summary>
+        [Conditional("Measure")]
         public static void FinalizeLog()
         {
             lock (finishedNodes)
@@ -281,20 +272,17 @@ namespace ChaosUtil.Debug
         ///     active measurements in order to detect mismatched <see cref="StartMeasure(string, CustomAttribute[])"/>
         ///     and <see cref="EndMeasure(System.Func{double, SysCol.IEnumerable{CustomAttribute}})"/> calls.
         /// </summary>
+        [Conditional("Measure")]
         public static void AssertZeroDepth()
         {
-#if Measure
             if (depth != 0)
                 throw new System.Exception("Log depth is not zero!");
-#endif
         }
 
         static void AssertNonZeroDepth()
         {
-#if Measure
             if (depth <= 0)
                 throw new System.Exception("No active measurement!");
-#endif
         }
 
         static void AsserMaxDepth()
