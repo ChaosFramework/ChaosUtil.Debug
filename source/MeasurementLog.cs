@@ -68,6 +68,9 @@ namespace ChaosUtil.Debug
 
         static int depth => busyClocks.Count;
 
+        static System.Threading.Thread worker;
+        static System.Threading.ManualResetEvent cancelWorker;
+
         static volatile bool initialized = false;
         static volatile object initLock = new object();
         static void Init()
@@ -82,7 +85,8 @@ namespace ChaosUtil.Debug
                         File.Delete(file);
 
                     wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
-                    System.Threading.Thread worker = new System.Threading.Thread(FlushRegularly);
+                    cancelWorker = new System.Threading.ManualResetEvent(false);
+                    worker = new System.Threading.Thread(FlushRegularly);
                     worker.Start();
                 }
         }
@@ -91,8 +95,8 @@ namespace ChaosUtil.Debug
         {
             while (alive)
             {
-                System.Threading.Thread.Sleep(SLEEP);
-                Flush();
+                cancelWorker.WaitOne(SLEEP);
+                if (alive) Flush();
             }
         }
 
@@ -236,22 +240,17 @@ namespace ChaosUtil.Debug
         static void Flush()
         {
             lock (finishedNodes)
-            {
-                if (alive)
-                    while (finishedNodes.Count > 0)
+                while (finishedNodes.Count > 0)
+                {
+                    string nextChunk = finishedNodes.Dequeue();
+                    if (wr.BaseStream.Length + nextChunk.Length > MAX_FILE_SIZE)
                     {
-                        string nextChunk = finishedNodes.Dequeue();
-                        if (wr.BaseStream.Length + nextChunk.Length > MAX_FILE_SIZE)
-                        {
-                            wr.Flush();
-                            wr.Close();
-                            wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
-                        }
-                        wr.Write(nextChunk);
+                        wr.Flush();
+                        wr.Close();
+                        wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
                     }
-                else
-                    finishedNodes.Clear();
-            }
+                    wr.Write(nextChunk);
+                }
         }
 
         /// <summary>
@@ -264,18 +263,16 @@ namespace ChaosUtil.Debug
             lock (finishedNodes)
                 if (alive)
                 {
+                    alive = false;
                     lock (initLock)
                         if (initialized)
                         {
+                            cancelWorker.Set();
+                            worker.Join();
                             Flush();
-                            if (wr != null)
-                            {
-                                wr.Flush();
-                                wr.Close();
-                            }
+                            wr.Flush();
+                            wr.Close();
                         }
-
-                    alive = false;
                 }
         }
 
