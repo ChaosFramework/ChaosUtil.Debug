@@ -300,10 +300,8 @@ namespace ChaosUtil.Debug
 
         static void AsserMaxDepth()
         {
-#if Measure
             if (depth > MAX_LOG_DEPTH)
                 throw new System.Exception("Exceeding maximum measurement log depth!");
-#endif
         }
 
         static Stopwatch PopClock()
