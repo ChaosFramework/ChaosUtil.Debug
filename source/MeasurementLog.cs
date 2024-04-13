@@ -72,7 +72,7 @@ namespace ChaosUtil.Debug
         static System.Threading.ManualResetEvent cancelWorker;
 
         static volatile bool initialized = false;
-        static volatile object initLock = new object();
+        static readonly object initLock = new object();
         static void Init()
         {
             lock (initLock)
