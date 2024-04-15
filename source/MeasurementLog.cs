@@ -1,5 +1,3 @@
-#define Measure
-
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -70,25 +68,35 @@ namespace ChaosUtil.Debug
 
         static int depth => busyClocks.Count;
 
-        static MeasurementLog()
-        {
-#if Measure
-            Directory.CreateDirectory(LOG_DIRECTORY);
-            foreach (string file in Directory.EnumerateFiles(LOG_DIRECTORY))
-                File.Delete(file);
+        static System.Threading.Thread worker;
+        static System.Threading.ManualResetEvent cancelWorker;
 
-            wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
-            System.Threading.Thread worker = new System.Threading.Thread(FlushRegularly);
-            worker.Start();
-#endif
+        static volatile bool initialized = false;
+        static readonly object initLock = new object();
+        static void Init()
+        {
+            lock (initLock)
+                if (!initialized)
+                {
+                    initialized = true;
+
+                    Directory.CreateDirectory(LOG_DIRECTORY);
+                    foreach (string file in Directory.EnumerateFiles(LOG_DIRECTORY))
+                        File.Delete(file);
+
+                    wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
+                    cancelWorker = new System.Threading.ManualResetEvent(false);
+                    worker = new System.Threading.Thread(FlushRegularly);
+                    worker.Start();
+                }
         }
 
         static void FlushRegularly()
         {
             while (alive)
             {
-                System.Threading.Thread.Sleep(SLEEP);
-                Flush();
+                cancelWorker.WaitOne(SLEEP);
+                if (alive) Flush();
             }
         }
 
@@ -101,7 +109,7 @@ namespace ChaosUtil.Debug
         [Conditional("Measure")]
         public static void StartMeasure(string action, params CustomAttribute[] attrs)
         {
-#if Measure
+            Init();
             lock (currentNode)
             {
                 AsserMaxDepth();
@@ -123,7 +131,6 @@ namespace ChaosUtil.Debug
                 currentNode.AppendLine(">");
                 PopClock().Restart();
             }
-#endif
         }
 
         /// <summary> Ends the most recently started still running measure. </summary>
@@ -135,7 +142,7 @@ namespace ChaosUtil.Debug
         [Conditional("Measure")]
         public static void EndMeasure(System.Func<double, SysCol.IEnumerable<CustomAttribute>> appendAttribute = null)
         {
-#if Measure
+            Init();
             lock (currentNode)
             {
                 AssertNonZeroDepth();
@@ -179,7 +186,6 @@ namespace ChaosUtil.Debug
                 freeClocks.Push(clock);
                 FinishNode();
             }
-#endif
         }
 
         static string GetTimeString(double tm)
@@ -208,15 +214,12 @@ namespace ChaosUtil.Debug
         [Conditional("Measure")]
         public static void AddMeasurement(string name, double duration)
         {
-#if Measure
+            Init();
             lock (currentNode)
             {
-                AssertNonZeroDepth();
-
                 currentNode.AppendLine(new string('\t', depth) + $"<{name} time=\"{GetTimeString(duration)}\"/>");
                 FinishNode();
             }
-#endif
         }
 
         static void FinishNode()
@@ -237,22 +240,17 @@ namespace ChaosUtil.Debug
         static void Flush()
         {
             lock (finishedNodes)
-            {
-                if (alive)
-                    while (finishedNodes.Count > 0)
+                while (finishedNodes.Count > 0)
+                {
+                    string nextChunk = finishedNodes.Dequeue();
+                    if (wr.BaseStream.Length + nextChunk.Length > MAX_FILE_SIZE)
                     {
-                        string nextChunk = finishedNodes.Dequeue();
-                        if (wr.BaseStream.Length + nextChunk.Length > MAX_FILE_SIZE)
-                        {
-                            wr.Flush();
-                            wr.Close();
-                            wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
-                        }
-                        wr.Write(nextChunk);
+                        wr.Flush();
+                        wr.Close();
+                        wr = new StreamWriter(File.Create($"{LOG_DIRECTORY}Measure {fileCounter++}.xml"));
                     }
-                else
-                    finishedNodes.Clear();
-            }
+                    wr.Write(nextChunk);
+                }
         }
 
         /// <summary>
@@ -263,18 +261,19 @@ namespace ChaosUtil.Debug
         public static void FinalizeLog()
         {
             lock (finishedNodes)
-            {
                 if (alive)
                 {
-                    Flush();
-                    if (wr != null)
-                    {
-                        wr.Flush();
-                        wr.Close();
-                    }
                     alive = false;
+                    lock (initLock)
+                        if (initialized)
+                        {
+                            cancelWorker.Set();
+                            worker.Join();
+                            Flush();
+                            wr.Flush();
+                            wr.Close();
+                        }
                 }
-            }
         }
 
         /// <summary>
@@ -283,28 +282,23 @@ namespace ChaosUtil.Debug
         ///     active measurements in order to detect mismatched <see cref="StartMeasure(string, CustomAttribute[])"/>
         ///     and <see cref="EndMeasure(System.Func{double, SysCol.IEnumerable{CustomAttribute}})"/> calls.
         /// </summary>
+        [Conditional("Measure")]
         public static void AssertZeroDepth()
         {
-#if Measure
             if (depth != 0)
                 throw new System.Exception("Log depth is not zero!");
-#endif
         }
 
         static void AssertNonZeroDepth()
         {
-#if Measure
             if (depth <= 0)
                 throw new System.Exception("No active measurement!");
-#endif
         }
 
         static void AsserMaxDepth()
         {
-#if Measure
             if (depth > MAX_LOG_DEPTH)
                 throw new System.Exception("Exceeding maximum measurement log depth!");
-#endif
         }
 
         static Stopwatch PopClock()
