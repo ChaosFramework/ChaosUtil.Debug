@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <!-- Properties -->
-  <Import Project="submodules/ChaosPresets.Targets/Frameworks/net4.5.2.targets" />
   <Import Project="submodules/ChaosPresets.Targets/Properties/OutputType/Library.targets" />
   <Import Project="submodules/ChaosPresets.Targets/Properties/ProjectStyle/$(ProjectStyle).targets" />
   <PropertyGroup>
