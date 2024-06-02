@@ -20,8 +20,5 @@
 
   <!-- References -->
   <Import Project="submodules/ChaosPresets.References/ProjectReferences/ChaosUtil.Reflection.targets" />
-  <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
 
 </Project>
