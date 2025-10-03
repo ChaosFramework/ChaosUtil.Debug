@@ -158,7 +158,15 @@ namespace ChaosUtil.Debug
                             if (compare.Name == property.Name && compare.DeclaringType == property.DeclaringType)
                                 goto property_already_exists;
 
-                        object value = property.GetValue(obj);
+                        object value;
+                        try
+                        {
+                            value = property.GetValue(obj);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            value = ex.ToString();
+                        }
                         string[] dat = new string[] {
                             "Property",
                             property.GetAccessor().ToString(),
