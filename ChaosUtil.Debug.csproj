@@ -23,6 +23,7 @@
   <Import Project="submodules/ChaosPresets.Targets/Configurations.targets" />
 
   <!-- References -->
+  <Import Project="submodules/ChaosPresets.References/ProjectReferences/ChaosUtil.Primitives.targets" />
   <Import Project="submodules/ChaosPresets.References/ProjectReferences/ChaosUtil.Reflection.targets" />
   <ItemGroup>
     <Reference Include="System" />
