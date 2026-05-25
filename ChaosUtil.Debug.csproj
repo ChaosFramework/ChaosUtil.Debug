@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import
-    Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
-    Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"
-    />
+<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Project Metadata -->
   <PropertyGroup>
@@ -13,27 +9,20 @@
   </PropertyGroup>
 
   <!-- Properties -->
-  <Import Project="submodules/ChaosPresets.Targets/Properties/Library.targets" />
-  <Import Project="submodules/ChaosPresets.Targets/Paths/Output/bin.targets" />
+  <Import Project="$(SolutionDir)submodules/ChaosPresets.Targets/Properties/Common.targets" />
+  <Import Project="$(SolutionDir)submodules/ChaosPresets.Targets/Properties/OutputType/Library.targets" />
   <PropertyGroup>
-    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <!-- Configurations -->
-  <Import Project="submodules/ChaosPresets.Targets/Configurations.targets" />
+  <Import Project="$(SolutionDir)submodules/ChaosPresets.Targets/Configurations.targets" />
 
   <!-- References -->
-  <Import Project="submodules/ChaosPresets.References/ProjectReferences/ChaosUtil.Reflection.targets" />
+  <Import Project="$(SolutionDir)submodules/ChaosPresets.References/ProjectReferences/ChaosUtil.Reflection.targets" />
+
   <ItemGroup>
-    <Reference Include="System" />
+    <Compile Include="source/**/*.cs" />
   </ItemGroup>
 
-  <!-- Included Files -->
-  <ItemGroup>
-    <Compile Include="source\**\*.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-
-  <!-- Default Targets for Building CSharp Projects -->
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
