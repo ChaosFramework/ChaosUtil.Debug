@@ -19,9 +19,9 @@ namespace ChaosUtil.Debug
 
         /// <summary> The product's folder in the current windows user's temp folder. Ends with a backslash. </summary>
         public static readonly string TEMP_FOLDER =
-            $"{System.IO.Path.GetTempPath()}{COMPANY}\\{Reflection.AssemblyMeta.productName}\\";
+            $"{System.IO.Path.GetTempPath()}{COMPANY}/{Reflection.AssemblyMeta.productName}/";
 
         /// <summary> The directory to save log files to. Ends with a backslash. </summary>
-        public static readonly string LOG_DIRECTORY = $"{TEMP_FOLDER}Logs\\{STARTUP_TIME_STRING}\\";
+        public static readonly string LOG_DIRECTORY = $"{TEMP_FOLDER}Logs/{STARTUP_TIME_STRING}/";
     }
 }
