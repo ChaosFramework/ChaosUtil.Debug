@@ -46,7 +46,7 @@ namespace ChaosUtil.Debug
         }
 
         /// <summary> The directory to save measurement log files to. Ends with a backslash. </summary>
-        public static readonly string LOG_DIRECTORY = $"{Constants.LOG_DIRECTORY}Measurements\\";
+        public static readonly string LOG_DIRECTORY = $"{Constants.LOG_DIRECTORY}Measurements/";
 
         const int SLEEP = 1000;
         const long MAX_FILE_SIZE = 10000000;

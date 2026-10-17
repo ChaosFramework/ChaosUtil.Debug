@@ -11,7 +11,7 @@ namespace ChaosUtil.Debug
     public static class ExceptionReport
     {
         /// <summary> The directory to save exception log files to. Ends with a backslash. </summary>
-        public static readonly string LOG_DIRECTORY = $"{Constants.LOG_DIRECTORY}Exceptions\\";
+        public static readonly string LOG_DIRECTORY = $"{Constants.LOG_DIRECTORY}Exceptions/";
 
         static readonly string[] LOG_COLUMNS = { "Declaration", "Accessor", "FieldType", "DeclaringType", "Name", "Value" };
         static readonly Flags[] allFieldFlags;
